@@ -9,7 +9,6 @@ import numpy as np
 import math
 from model.dropSke import DropBlock_Ske
 from model.dropT import DropBlockT_1d
-from graph.graph_part import parts as pa_parts  # --add
 from model.PA_TA_attention import ST_Joint_Att5,Tpart_Att,ACCAblock, SCCAblock
 
 def import_class(name):
