@@ -39,9 +39,6 @@ def bn_init(bn, scale):
 
 
 class unit_tcn(nn.Module):
-    """
-    这里修改成膨胀卷积
-    """
     def __init__(self, in_channels, out_channels, kernel_size=9, stride=1, dilation=1, autopad=True,
                  num_point=27, block_size=41):
         super(unit_tcn, self).__init__()
@@ -66,7 +63,6 @@ class unit_tcn(nn.Module):
 
 
 class unit_tcn_skip(nn.Module):
-    """ 修改 """
     def __init__(self, in_channels, out_channels, kernel_size=9, stride=1, dilation=1, autopad=True):
         super(unit_tcn_skip, self).__init__()
         if autopad:
