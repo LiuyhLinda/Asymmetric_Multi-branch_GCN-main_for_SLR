@@ -1,4 +1,4 @@
-# AM-GCN-main_for_SLR
+# Asymmetric_Multi-branch_GCN-main_for_SLR
 We present the AM-GCN architecture here.
 
 Some code is being improved and will be updated later.
