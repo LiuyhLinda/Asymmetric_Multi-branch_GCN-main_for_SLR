@@ -18,7 +18,7 @@ r3 = list(pickle.load(r3).items())
 r4 = open('./work_dir/'+data+'_bone_motion/eval_results/best_acc'+flag+'.pkl', 'rb')
 r4 = list(pickle.load(r4).items())
 
-alpha = [1.3, 1, 0.35, 0.1] # wlasl
+alpha = [1.3, 1, 0.35, 0.1]
 
 
 right_num = total_num = right_num_5 = 0
