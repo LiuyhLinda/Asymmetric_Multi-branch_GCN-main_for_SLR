@@ -399,7 +399,7 @@ class TCN_GCN_unit2(nn.Module):
                              stride=stride, num_point=num_point, dilation=dilation, autopad=autopad)
 
         self.relu = nn.ReLU()
-
+        autopad=False
         self.A = nn.Parameter(torch.tensor(np.sum(np.reshape(A.astype(np.float32), [
             3, num_point, num_point]), axis=0), dtype=torch.float32, requires_grad=False, device='cuda'),
                               requires_grad=False)
