@@ -91,7 +91,7 @@ class Feeder(Dataset):
                 if self.is_vector:
                     data_numpy[0,:,:,:] = - data_numpy[0,:,:,:]
                 else: 
-                    data_numpy[0,:,:,:] = 512 - data_numpy[0,:,:,:]  # 每16个图中，翻转一个图，水平、竖直方向均变化
+                    data_numpy[0,:,:,:] = 512 - data_numpy[0,:,:,:]
 
         if self.normalization:
             # data_numpy = (data_numpy - self.mean_map) / self.std_map
@@ -111,12 +111,6 @@ class Feeder(Dataset):
                 data_numpy[0,:,:,:] += random.random() * 20 - 10.0
                 data_numpy[1,:,:,:] += random.random() * 20 - 10.0
 
-
-        # if self.random_shift:
-        #     data_numpy = tools.random_shift(data_numpy)
-
-        # elif self.window_size > 0:
-        #     data_numpy = tools.auto_pading(data_numpy, self.window_size)
         if self.random_move:
             data_numpy = tools.random_move(data_numpy)
 
@@ -134,98 +128,4 @@ def import_class(name):
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
-
-
-def test(data_path, label_path, vid=None, graph=None, is_3d=False):
-    '''
-    vis the samples using matplotlib
-    :param data_path: 
-    :param label_path: 
-    :param vid: the id of sample
-    :param graph: 
-    :param is_3d: when vis NTU, set it True
-    :return: 
-    '''
-    # import matplotlib # add
-    # matplotlib.use('TkAgg')  # --add Agg不报错，但不显示图片；TkAgg报错
-    import matplotlib.pyplot as plt
-
-    loader = torch.utils.data.DataLoader(
-        dataset=Feeder(data_path, label_path),
-        batch_size=64,
-        shuffle=False,
-        num_workers=2)
-
-    if vid is not None:
-        sample_name = loader.dataset.sample_name
-        # print("sample_name", sample_name)  # add
-        sample_id = [name.split('.')[0] for name in sample_name]
-        index = sample_id.index(vid)
-        data, label, index = loader.dataset[index]
-        data = data.reshape((1,) + data.shape)
-
-        # for batch_idx, (data, label) in enumerate(loader):
-        N, C, T, V, M = data.shape  # (1, 3, 150, 27, 1)
-        print("data.shape", data.shape)
-        # print("data",data)
-
-        plt.ion() # 打开交互模式，在显示图片的同时，代码可以运行。
-        fig = plt.figure()
-        if is_3d:
-            from mpl_toolkits.mplot3d import Axes3D
-            ax = fig.add_subplot(111, projection='3d')  # 一行一列第一个图
-        else:
-            ax = fig.add_subplot(111)
-
-        if graph is None:
-            p_type = ['b.', 'g.', 'r.', 'c.', 'm.', 'y.', 'k.', 'k.', 'k.', 'k.']
-            pose = [
-                ax.plot(np.zeros(V), np.zeros(V), p_type[m])[0] for m in range(M)
-            ]
-            ax.axis([-1, 1, -1, 1])
-            for t in range(T):
-                for m in range(M):
-                    pose[m].set_xdata(data[0, 0, t, :, m])
-                    pose[m].set_ydata(data[0, 1, t, :, m])
-                fig.canvas.draw()  # 原程序
-                plt.pause(0.001)
-        else:
-            p_type = ['b-', 'g-', 'r-', 'c-', 'm-', 'y-', 'k-', 'k-', 'k-', 'k-']
-            import sys
-            from os import path
-            sys.path.append(
-                path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))
-            G = import_class(graph)()
-            edge = G.inward
-            pose = []
-            for m in range(M):  # num_person
-                a = []
-                for i in range(len(edge)):
-                    if is_3d:
-                        a.append(ax.plot(np.zeros(3), np.zeros(3), p_type[m])[0])
-                    else:
-                        a.append(ax.plot(np.zeros(2), np.zeros(2), p_type[m])[0])
-                pose.append(a)
-                # print("pose",pose)
-            ax.axis([-1, 1, -1, 1])  # 通过改变绘图区维度等比例缩放
-            if is_3d:
-                ax.set_zlim3d(-1, 1) # 设置坐标轴的范围。
-            for t in range(T):
-                for m in range(M):
-                    for i, (v1, v2) in enumerate(edge):
-                        x1 = data[0, :2, t, v1, m]
-                        x2 = data[0, :2, t, v2, m]
-                        if (x1.sum() != 0 and x2.sum() != 0) or v1 == 1 or v2 == 1:
-                            pose[m][i].set_xdata(data[0, 0, t, [v1, v2], m]) # set_xdata设置数组x
-                            pose[m][i].set_ydata(data[0, 1, t, [v1, v2], m])
-                            if is_3d:
-                                pose[m][i].set_3d_properties(data[0, 2, t, [v1, v2], m]) # 3D则有z的坐标
-                                # plt.imshow(pose[m][i], cmap='gray')  # 可视化邻接矩阵---add
-                                # plt.show() #--add
-                fig.canvas.draw()  # 原程序
-                # plt.figure() #--add
-                # fig.canvas.draw_idle() #--add
-
-                # plt.savefig('/home/lshi/Desktop/skeleton_sequence/' + str(t) + '.jpg')
-                plt.pause(0.01)
 
