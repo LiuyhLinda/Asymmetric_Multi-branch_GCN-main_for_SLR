@@ -10,9 +10,7 @@ import numpy as np
 import yaml
 import pickle
 from collections import OrderedDict
-# torch
 import torch
-# torch.backends.cudnn.enabled = False  # ----add
 import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
@@ -23,6 +21,7 @@ import random
 import inspect
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as F
+torch.backends.cudnn.enabled = False
 
 
 def init_seed(_):
@@ -43,13 +42,6 @@ def get_parser():
         '--work-dir',
         default='./work_dir/temp',
         help='the work folder for storing results')
-    parser.add_argument(
-        '--best_acc', type=float, default='0', help='best_acc')  # --add
-    parser.add_argument(
-        '--now_acc', type=float, default='0', help='now_acc')  # --add
-    parser.add_argument(
-        '--t_count', type=int, default=0, help='frame_count')  # --add
-
     parser.add_argument('-model_saved_name', default='')
     parser.add_argument('-Experiment_name', default='')
     parser.add_argument(
@@ -371,7 +363,6 @@ class Processor():
                     print(key + '-not require grad')
         for batch_idx, (data, label, index) in enumerate(process):
             self.global_step += 1
-            # get data
             data = Variable(data.float().cuda(
                 self.output_device), requires_grad=False)
             label = Variable(label.long().cuda(
